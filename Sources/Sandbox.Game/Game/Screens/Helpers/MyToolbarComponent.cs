@@ -173,6 +173,15 @@ namespace Sandbox.Game.Screens.Helpers
                         CurrentToolbar.SelectNextSlot();
                     else if (MyControllerHelper.IsControl(context, MyControlsSpace.TOOLBAR_PREV_ITEM, MyControlStateType.NEW_PRESSED))
                         CurrentToolbar.SelectPreviousSlot();
+
+                    // Shift + MouseScrollWheel Slot selection
+                    if (MyInput.Static.IsAnyShiftKeyPressed())
+                    {
+                        if (MyInput.Static.MouseScrollWheelValue() < MyInput.Static.PreviousMouseScrollWheelValue())
+                            CurrentToolbar.SelectNextSlot();
+                        else if (MyInput.Static.MouseScrollWheelValue() > MyInput.Static.PreviousMouseScrollWheelValue())
+                            CurrentToolbar.SelectPreviousSlot();
+                    }
                 }
             }
             finally
