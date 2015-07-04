@@ -45,6 +45,8 @@ namespace Sandbox.Game.Entities.Blocks
         private MyEntity3DSoundEmitter[] m_soundEmitters;
         private int m_soundEmitterIndex;
         private long m_startLoopTimeMs;
+        private List<MyGuiControlListbox.Item> m_selectedCategoryItems = null;
+        private List<string> m_selectedCategories = null;
 
         #endregion
 
@@ -156,6 +158,19 @@ namespace Sandbox.Game.Entities.Blocks
             rangeSlider.EnableActions();
             MyTerminalControlFactory.AddControl(rangeSlider);
             
+            var soundCategories = new MyTerminalControlListbox<MySoundBlock>("SoundCategories", MyStringId.GetOrCompute("Sound Category"), MySpaceTexts.Blank, true);
+            soundCategories.ListContent = (x, list1, list2) => x.FillSoundCategoriesList(list1, list2);
+            soundCategories.ItemSelected = (x, y) => x.SelectCategory(y);
+            MyTerminalControlFactory.AddControl(soundCategories);
+
+            var showSounds = new MyTerminalControlButton<MySoundBlock>("ShowSounds", MyStringId.GetOrCompute("List Sounds"), MySpaceTexts.Blank, (x) => x.ListSounds());
+            MyTerminalControlFactory.AddControl(showSounds);
+
+            var soundsList = new MyTerminalControlListbox<MySoundBlock>("SoundsList", MySpaceTexts.BlockPropertyTitle_SoundBlockSoundList, MySpaceTexts.Blank);
+            soundsList.ListContent = (x, list1, list2) => x.FillListContent(list1, list2);
+            soundsList.ItemSelected = (x, y) => x.SelectSound(y, true);
+            MyTerminalControlFactory.AddControl(soundsList);
+
             var playButton = new MyTerminalControlButton<MySoundBlock>("PlaySound", MySpaceTexts.BlockPropertyTitle_SoundBlockPlay, MySpaceTexts.Blank, (x) => x.SyncObject.SendPlaySoundRequest());
             playButton.Enabled = (x) => x.IsSoundSelected;
             playButton.EnableAction();
@@ -176,11 +191,6 @@ namespace Sandbox.Game.Entities.Blocks
             loopableTimeSlider.Denormalizer = (x, f) => x.DenormalizeLoopPeriod(f);
             loopableTimeSlider.EnableActions();
             MyTerminalControlFactory.AddControl(loopableTimeSlider);
-
-            var soundsList = new MyTerminalControlListbox<MySoundBlock>("SoundsList", MySpaceTexts.BlockPropertyTitle_SoundBlockSoundList, MySpaceTexts.Blank);
-            soundsList.ListContent = (x, list1, list2) => x.FillListContent(list1, list2);
-            soundsList.ItemSelected = (x, y) => x.SelectSound(y, true);
-            MyTerminalControlFactory.AddControl(soundsList);
         }
 
         public MySoundBlock() : base()
@@ -373,20 +383,83 @@ namespace Sandbox.Game.Entities.Blocks
 
         private void FillListContent(ICollection<MyGuiControlListbox.Item> listBoxContent, ICollection<MyGuiControlListbox.Item> listBoxSelectedItems)
         {
-            foreach (var soundCategory in MyDefinitionManager.Static.GetSoundCategoryDefinitions())
+            if (m_selectedCategories == null || m_selectedCategories.Count == 0)
+                return; 
+
+            foreach (var soundCategory in m_selectedCategories)
             {
-                foreach (var sound in soundCategory.Sounds)
+                var category = MyDefinitionManager.Static.GetSoundCategoryDefinitions().First(x => x.Id.SubtypeName == soundCategory);
+
+                foreach (var sound in category.Sounds)
                 {
                     m_helperSB.Clear().Append(sound.SoundText);
                     var stringId = MySoundPair.GetCueId(sound.SoundId);
-                    
+
                     var item = new MyGuiControlListbox.Item(text: m_helperSB, userData: stringId);
 
                     listBoxContent.Add(item);
+
                     if (stringId == CueId)
                         listBoxSelectedItems.Add(item);
                 }
             }
+        }
+
+        private void FillSoundCategoriesList(ICollection<MyGuiControlListbox.Item> listBoxContent, ICollection<MyGuiControlListbox.Item> listBoxSelectedItems)
+        {
+            if (BlockDefinition is MySoundBlockDefinition)
+            {
+                foreach (var soundCategory in ((MySoundBlockDefinition)BlockDefinition).SoundCategories)
+                {
+                    var category = MyDefinitionManager.Static.GetSoundCategoryDefinitions().First(x => x.Id.SubtypeName == soundCategory);
+
+                    var item = new MyGuiControlListbox.Item(text: m_helperSB.Clear().Append(category.Id.SubtypeName));
+                    listBoxContent.Add(item);
+                }
+            }
+            else
+            {
+                foreach (var soundCategory in MyDefinitionManager.Static.GetSoundCategoryDefinitions())
+                {
+                    var item = new MyGuiControlListbox.Item(text: m_helperSB.Clear().Append(soundCategory.Id.SubtypeName));
+                    listBoxContent.Add(item);
+                }
+            }
+
+            if (m_selectedCategories == null || m_selectedCategories.Count == 0)
+            {
+                m_selectedCategories = new List<string>();
+                m_selectedCategories.Clear();
+
+                listBoxSelectedItems = listBoxContent;
+
+                for (int i = 0; i < listBoxSelectedItems.Count; i++)
+                {
+                    m_selectedCategories.Add(listBoxSelectedItems.ToList()[i].Text.ToString());
+                }
+            }
+        }
+
+        public void SelectCategory(List<MyGuiControlListbox.Item> categories)
+        {
+            m_selectedCategoryItems = categories;
+        }
+
+        public void ListSounds()
+        {
+            if (m_selectedCategoryItems == null || m_selectedCategoryItems.Count == 0)
+                return;
+
+            if (m_selectedCategories == null)
+                m_selectedCategories = new List<string>();
+            m_selectedCategories.Clear();
+
+            for (int i = 0; i < m_selectedCategoryItems.Count; i++ )
+            {
+                m_selectedCategories.Add(m_selectedCategoryItems[i].Text.ToString());
+            }
+
+            RaisePropertiesChanged();
         }
 
         private float NormalizeLoopPeriod(float value)

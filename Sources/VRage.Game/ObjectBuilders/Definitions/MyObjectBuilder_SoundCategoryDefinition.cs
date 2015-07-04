@@ -6,6 +6,14 @@ namespace Sandbox.Common.ObjectBuilders.Definitions
 {
     [ProtoContract]
     [MyObjectBuilderDefinition]
+    public class MyObjectBuilder_SoundBlockDefinition : MyObjectBuilder_CubeBlockDefinition
+    {
+        [ProtoMember]
+        public string[] SoundCategories;
+    }
+
+    [ProtoContract]
+    [MyObjectBuilderDefinition]
     public class MyObjectBuilder_SoundCategoryDefinition : MyObjectBuilder_DefinitionBase
     {
         [ProtoContract]

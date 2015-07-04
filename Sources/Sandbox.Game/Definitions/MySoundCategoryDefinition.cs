@@ -6,11 +6,26 @@ using System.Text;
 
 using VRage.Utils;
 using VRage;
-using VRage.Utils;
 using VRage.Library.Utils;
 
 namespace Sandbox.Definitions
 {
+    [MyDefinitionType(typeof(MyObjectBuilder_SoundBlockDefinition))]
+    public class MySoundBlockDefinition : MyCubeBlockDefinition
+    {
+        public string[] SoundCategories;
+
+        protected override void Init(MyObjectBuilder_DefinitionBase builder)
+        {
+            base.Init(builder);
+
+            var soundBlockBuilder = builder as MyObjectBuilder_SoundBlockDefinition;
+            MyDebug.AssertDebug(soundBlockBuilder != null);
+
+            SoundCategories = soundBlockBuilder.SoundCategories;
+        }
+    }
+
     [MyDefinitionType(typeof(MyObjectBuilder_SoundCategoryDefinition))]
     public class MySoundCategoryDefinition : MyDefinitionBase
     {
