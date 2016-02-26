@@ -57,6 +57,7 @@ namespace Sandbox.Game.Weapons
         public MyAmmoMagazineDefinition CurrentAmmoMagazineDefinition { get { return WeaponProperties.AmmoMagazineDefinition; } }
         public MyDefinitionId CurrentAmmoMagazineId { get { return WeaponProperties.AmmoMagazineId; } }
         public MyAmmoDefinition CurrentAmmoDefinition { get { return WeaponProperties.AmmoDefinition; } }
+        public int BurstFireRate { get { return m_weaponProperties.CurrentWeaponBurstFireRate; } }
         public float BackkickForcePerSecond
         {
             get
