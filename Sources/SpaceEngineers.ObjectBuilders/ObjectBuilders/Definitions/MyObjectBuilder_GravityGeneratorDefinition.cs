@@ -13,5 +13,11 @@ namespace Sandbox.Common.ObjectBuilders.Definitions
 	    public string ResourceSinkGroup;
         [ProtoMember]
         public float RequiredPowerInput;
+        [ProtoMember]
+        public float FieldWidth = 150f;
+        [ProtoMember]
+        public float FieldHeight = 150f;
+        [ProtoMember]
+        public float FieldDepth = 150f;
     }
 }

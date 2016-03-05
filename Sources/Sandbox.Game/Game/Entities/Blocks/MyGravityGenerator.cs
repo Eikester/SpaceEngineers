@@ -117,7 +117,7 @@ namespace Sandbox.Game.Entities
             base.Init(objectBuilder, cubeGrid);
 
             var builder = (MyObjectBuilder_GravityGenerator)objectBuilder;
-            m_fieldSize.Value = builder.FieldSize;
+            m_fieldSize.Value = builder.FieldSize.X == 150f ? builder.FieldSize : new SerializableVector3();
             m_gravityAcceleration.Value = builder.GravityAcceleration;
         }
 

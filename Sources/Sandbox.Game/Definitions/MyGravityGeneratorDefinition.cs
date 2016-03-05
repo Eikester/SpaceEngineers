@@ -10,6 +10,9 @@ namespace Sandbox.Definitions
     {
 	    public MyStringHash ResourceSinkGroup;
         public float RequiredPowerInput;
+        public float FieldWidth;
+        public float FieldHeight;
+        public float FieldDepth;
 
         protected override void Init(MyObjectBuilder_DefinitionBase builder)
         {
@@ -19,6 +22,9 @@ namespace Sandbox.Definitions
             MyDebug.AssertDebug(obGenerator != null, "Initializing thrust definition using wrong object builder.");
 	        ResourceSinkGroup = MyStringHash.GetOrCompute(obGenerator.ResourceSinkGroup);
             RequiredPowerInput = obGenerator.RequiredPowerInput;
+            FieldWidth = obGenerator.FieldWidth;
+            FieldHeight = obGenerator.FieldHeight;
+            FieldDepth = obGenerator.FieldDepth;
         }
     }
 }
